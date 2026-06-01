@@ -1,0 +1,8 @@
+package com.cafe_shop.payment.model;
+
+public enum PaymentMethod {
+    CASH,
+    CARD,
+    KHQR
+}
+

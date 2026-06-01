@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:cafe_shop_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    driverClassName: org.h2.Driver
+    username: sa
+    password: sa
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  main:
+    banner-mode: "off"
+
+app:
+  security:
+    jwt:
+      issuer: cafe_shop_test
+      access-token-ttl-minutes: 1
+      refresh-token-ttl-days: 1
+      secret: test-secret-test-secret-test-secret-test-secret
