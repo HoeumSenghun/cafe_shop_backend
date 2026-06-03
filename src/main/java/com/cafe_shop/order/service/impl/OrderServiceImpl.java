@@ -2,8 +2,10 @@ package com.cafe_shop.order.service.impl;
 
 import com.cafe_shop.common.exception.BusinessException;
 import com.cafe_shop.common.exception.ResourceNotFoundException;
+import com.cafe_shop.order.dto.OrderDtos.CashierOrderResponse;
 import com.cafe_shop.order.dto.OrderDtos.CreateOrderRequest;
 import com.cafe_shop.order.dto.OrderDtos.OrderResponse;
+import com.cafe_shop.order.dto.OrderDtos.PendingOrderSummaryResponse;
 import com.cafe_shop.order.dto.OrderDtos.UpdateStatusRequest;
 import com.cafe_shop.order.mapper.OrderMapper;
 import com.cafe_shop.order.model.Order;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -89,6 +92,23 @@ public class OrderServiceImpl implements com.cafe_shop.order.service.OrderServic
         Order order = orderRepository.findByIdAndCustomerId(id, cu.userId())
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         return orderMapper.toResponse(order);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CashierOrderResponse> listAllForCashier(OrderStatus status, Pageable pageable) {
+        Page<Order> page = status == null
+                ? orderRepository.findAllByOrderByCreatedAtDesc(pageable)
+                : orderRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
+        return page.map(orderMapper::toCashierResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PendingOrderSummaryResponse> listPendingSummaries() {
+        return orderRepository.findTop20ByStatusOrderByCreatedAtDesc(OrderStatus.PENDING).stream()
+                .map(orderMapper::toPendingSummary)
+                .toList();
     }
 
     @Override

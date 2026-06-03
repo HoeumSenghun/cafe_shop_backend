@@ -1,7 +1,9 @@
 package com.cafe_shop.order.mapper;
 
+import com.cafe_shop.order.dto.OrderDtos.CashierOrderResponse;
 import com.cafe_shop.order.dto.OrderDtos.OrderItemResponse;
 import com.cafe_shop.order.dto.OrderDtos.OrderResponse;
+import com.cafe_shop.order.dto.OrderDtos.PendingOrderSummaryResponse;
 import com.cafe_shop.order.model.Order;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +12,39 @@ import java.util.List;
 @Component
 public class OrderMapper {
     public OrderResponse toResponse(Order o) {
-        List<OrderItemResponse> items = o.getItems().stream()
+        return OrderResponse.builder()
+                .id(o.getId())
+                .status(o.getStatus())
+                .totalAmount(o.getTotalAmount())
+                .createdAt(o.getCreatedAt())
+                .items(toItemResponses(o))
+                .build();
+    }
+
+    public CashierOrderResponse toCashierResponse(Order o) {
+        return CashierOrderResponse.builder()
+                .id(o.getId())
+                .status(o.getStatus())
+                .totalAmount(o.getTotalAmount())
+                .createdAt(o.getCreatedAt())
+                .customerFullName(o.getCustomer().getFullName())
+                .customerEmail(o.getCustomer().getEmail())
+                .items(toItemResponses(o))
+                .build();
+    }
+
+    public PendingOrderSummaryResponse toPendingSummary(Order o) {
+        return PendingOrderSummaryResponse.builder()
+                .id(o.getId())
+                .totalAmount(o.getTotalAmount())
+                .createdAt(o.getCreatedAt())
+                .customerFullName(o.getCustomer().getFullName())
+                .itemCount(o.getItems().size())
+                .build();
+    }
+
+    private List<OrderItemResponse> toItemResponses(Order o) {
+        return o.getItems().stream()
                 .map(i -> OrderItemResponse.builder()
                         .productId(i.getProduct().getId())
                         .productName(i.getProduct().getName())
@@ -19,14 +53,6 @@ public class OrderMapper {
                         .lineTotal(i.getLineTotal())
                         .build())
                 .toList();
-
-        return OrderResponse.builder()
-                .id(o.getId())
-                .status(o.getStatus())
-                .totalAmount(o.getTotalAmount())
-                .createdAt(o.getCreatedAt())
-                .items(items)
-                .build();
     }
 }
 

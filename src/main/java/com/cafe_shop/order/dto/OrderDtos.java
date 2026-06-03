@@ -46,5 +46,25 @@ public class OrderDtos {
     public record UpdateStatusRequest(
             @NotNull OrderStatus status
     ) {}
+
+    @Builder
+    public record CashierOrderResponse(
+            Long id,
+            OrderStatus status,
+            BigDecimal totalAmount,
+            Instant createdAt,
+            String customerFullName,
+            String customerEmail,
+            List<OrderItemResponse> items
+    ) {}
+
+    @Builder
+    public record PendingOrderSummaryResponse(
+            Long id,
+            BigDecimal totalAmount,
+            Instant createdAt,
+            String customerFullName,
+            int itemCount
+    ) {}
 }
 

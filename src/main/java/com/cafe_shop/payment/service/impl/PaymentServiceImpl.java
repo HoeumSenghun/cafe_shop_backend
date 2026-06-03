@@ -12,6 +12,8 @@ import com.cafe_shop.payment.model.PaymentStatus;
 import com.cafe_shop.payment.repository.PaymentRepository;
 import com.cafe_shop.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +58,15 @@ public class PaymentServiceImpl implements PaymentService {
         Payment p = paymentRepository.findTopByOrderIdOrderByCreatedAtDesc(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
         return paymentMapper.toResponse(p);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> listAll(PaymentStatus status, Pageable pageable) {
+        Page<Payment> page = status == null
+                ? paymentRepository.findAllByOrderByCreatedAtDesc(pageable)
+                : paymentRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
+        return page.map(paymentMapper::toResponse);
     }
 }
 
